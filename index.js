@@ -9,16 +9,29 @@ const layouts = require("express-ejs-layouts");
 const methodOverride = require("method-override");
 const session = require("express-session");
 const app = express();
-const axios = require("axios");
-const axiosController = require("./controllers/axiosTestController");
+const userRoute = require('./routes/user.routes')
+const cors = require("cors");
+
 
 
 mongoose.Promise = global.Promise;
 mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/svs", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useCreateIndex: true,
-});
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useCreateIndex: true,
+}).then(() => {
+  console.log('Database connected sucessfully !')
+},
+  error => {
+      console.log('Database could not be connected : ' + error)
+  }
+)
+//mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/svs", {
+//    useNewUrlParser: true,
+//    useUnifiedTopology: true,
+//    useCreateIndex: true,
+//});
+
 app.engine("ejs", require("ejs-locals"));
 app.set("view engine", "ejs");
 
@@ -32,6 +45,8 @@ if (process.env.NODE_ENV === 'production') {
     })
   
   }
+app.use(cors());
+app.use("/users", userRoute);
 app.use(express.urlencoded({extended: false}));
 app.use(express.json());
 app.use(express.static("public"));
